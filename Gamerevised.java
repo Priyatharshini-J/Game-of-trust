@@ -10,7 +10,7 @@ enum Moves {
 abstract class Player
 {
     String name;
-    String moveType;
+    Moves moveType = null;
     int score;
      void player(String name){
         this.name = name;
@@ -24,31 +24,35 @@ abstract class Player
       int getScore(){
         return this.score;
     }
-     String getmoveType(){
+     Moves getmoveType(){
         return this.moveType;
     }
-    abstract void setmoveType(String move);
+    abstract void setmoveType();
 }
 
-class Copycat extends Player
-{
-    void setmoveType(String move){
-        if(move == null){this.moveType = "Cooperate";}
-        else{this.moveType = move;} 
-    }
-}
+// class Copycat extends Player
+// {
+
+//     void setmoveType(int move){
+
+//         if(move == null){this.moveType = Moves.COOPERATE;}
+//         else{this.moveType = Moves.values()[move];} 
+//     }
+// }
 
 class Cooperate extends Player
 {
-    void setmoveType(String move){
-        this.moveType = "Cooperate";
+    void setmoveType(){
+        this.moveType = Moves.COOPERATE;
     }
 }
 
 class Human extends Player
 {
-    void setmoveType(String move){
-        this.moveType = move;
+    Scanner scan = new Scanner(System.in);
+    int move = scan.nextInt();
+    void setmoveType(){
+        this.moveType = Moves.values()[move];
     }
 }
 
@@ -56,37 +60,35 @@ class Human extends Player
 class Machine
 {
     Player playa, playb;
-    Scanner scan;
     int rounds;
-    String finalmoveA;
-    String finalmoveB;
 
-    Machine(Player playera,Player playerb, int round, Scanner scan){
+    Machine(Player playera,Player playerb, int round){
        this.playa = playera;
        this.playb = playerb;
        this.rounds = round;
-       this.scan = scan;
     }
     int coinA;
     int coinB;
-     void calculateCoins(String moveA, String moveB){
-     String aopt = moveA;
-     String bopt = moveB;
+    String nameA = playa.getPlayer();
+    String nameB = playb.getPlayer();
+     void calculateCoins(Moves moveA, Moves moveB){
+     // String aopt = moveA;
+     // String bopt = moveB;
      int  scoreA = playa.getScore();
      int  scoreB = playb.getScore();
-    if(aopt.equals("Cheat") && bopt.equals("Cheat")){
+    if(moveA == Moves.CHEAT && moveB == Moves.CHEAT){
         this.coinA = scoreA;
         this.coinB = scoreB;
     }
-     else if(aopt.equals("Cooperate") && bopt.equals("Cooperate")){
+     else if(moveA == Moves.COOPERATE && moveB == Moves.COOPERATE){
         this.coinA = scoreA + 2;
         this.coinB = scoreB + 2;
     }
-    else if(aopt.equals("Cheat") && bopt.equals("Cooperate")){
+    else if(moveA == Moves.CHEAT && moveB == Moves.COOPERATE){
         this.coinA = scoreA + 3;
         this.coinB = scoreB - 1;
     }
-    else if(aopt.equals("Cooperate") && bopt.equals("Cheat")){
+    else if(moveA == Moves.COOPERATE && moveB == Moves.CHEAT){
         this.coinA = scoreA - 1;
         this.coinB = scoreB + 3;
     }
@@ -94,47 +96,16 @@ class Machine
     playb.setScore(coinB);
     }
     void repeattimes(){
+        System.out.println("In repeat");
         for(int i=1; i<=rounds; i++)
         {
-        String nameA = playa.getPlayer();
-        String nameB = playb.getPlayer();
-        String moveA = playa.getmoveType();
-        String moveB = playb.getmoveType();
         System.out.println("Round " + i);
-        System.out.println("Input from " + nameA + "(Player A) - Cheat/Cooperate");
-        if(nameA.equals("Copycat")){
-            playa.setmoveType(moveB);
-            finalmoveA = playa.getmoveType();
-            System.out.println(finalmoveA);
-        }
-        else if(nameA.equals("Cooperate"))
-        {
-            playa.setmoveType(moveB);
-            finalmoveA = playa.getmoveType();
-            System.out.println(finalmoveA);
-        } 
-        else
-        {
-            finalmoveA = scan.next();
-            playa.setmoveType(finalmoveA);
-        } 
-        System.out.println("Input from " + nameB + "(Player B) - Cheat/Cooperate");
-        if(nameB.equals("Copycat")){
-            playb.setmoveType(moveA);
-            finalmoveB = playa.getmoveType();
-            System.out.println(finalmoveB);
-        }
-        else if(nameB.equals("Cooperate"))
-        {
-            playb.setmoveType(moveA);
-            finalmoveB = playa.getmoveType();
-            System.out.println(finalmoveB);
-        } 
-        else
-        {
-            finalmoveB = scan.next();
-            playb.setmoveType(finalmoveB);
-        } 
+        System.out.println("Input from " + nameA + "(Player A) - 0(Cheat)/1(Cooperate)");
+        playa.setmoveType();
+        Moves finalmoveA = playa.getmoveType();
+        System.out.println("Input from " + nameB + "(Player B) - 0(Cheat)/1(Cooperate)");
+        playb.setmoveType();
+        Moves finalmoveB = playb.getmoveType();
         calculateCoins(finalmoveA, finalmoveB);
         }
     }
@@ -152,27 +123,30 @@ public class Gamerevised
     String nameA = in.next ();
     System.out.println ("Choose playerB - Copycat/Cooperate/Human");
     String nameB = in.next ();
+    Player playera = null;
+    Player playerb = null;
     if(nameA.equals("Cooperate")){
-    Player playera = new Cooperate();
+    playera = new Cooperate();
     }
     else if (nameA.equals("Copycat")){
-    Player playera = new Copycat();
+    playera = new Copycat();
     }
     else if (nameA.equals("Human")){
-    Player playera = new Human();
+    playera = new Human();
+    System.out.println("Here");
     }
     if(nameB.equals("Cooperate")){
-    Player playerb = new Cooperate();
+    playerb = new Cooperate();
     }
     else if (nameB.equals("Copycat")){
-    Player playerb = new Copycat();
+    playerb = new Copycat();
     }
     else if (nameB.equals("Human")){
-    Player playerb = new Human();
+    playerb = new Human();
     }
     playera.player(nameA);
     playerb.player(nameB);
-    Machine mac = new Machine(playera, playerb, rounds, in);
+    Machine mac = new Machine(playera, playerb, rounds);
     mac.repeattimes();
     System.out.println("Score of " + playera.getPlayer() + "(Player A) is: " + playera.getScore());
     System.out.println("Score of " + playerb.getPlayer() + "(Player B) is: " + playerb.getScore());
