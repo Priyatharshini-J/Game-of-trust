@@ -13,9 +13,11 @@ abstract class Player
     Moves moveType = null;
     int score;
     Machine mac;
-     void player(String name, Machine mac){
-        this.name = name;
+    void getmachine(Machine mac){
         this.mac = mac;
+    }
+     void player(String name){
+        this.name = name;
     }
      String getPlayer(){
         return this.name;
@@ -37,9 +39,12 @@ class Copycat extends Player
     void setmoveType(){
         Moves oppmove = mac.getmove();
         if(oppmove == null){this.moveType = Moves.COOPERATE;}
-        else{
+        else
+        {
             int move = oppmove.ordinal();
-            this.moveType = Moves.values()[move];} 
+            this.moveType = Moves.values()[move];
+        } 
+        System.out.println(moveType.ordinal());
     }
 }
 
@@ -47,14 +52,15 @@ class Cooperate extends Player
 {
     void setmoveType(){
         this.moveType = Moves.COOPERATE;
+        System.out.println(moveType.ordinal());
     }
 }
 
 class Human extends Player
 {
-    Scanner scan = new Scanner(System.in);
-    int move = scan.nextInt();
     void setmoveType(){
+        Scanner scan = new Scanner(System.in);
+        int move = scan.nextInt();
         this.moveType = Moves.values()[move];
     }
 }
@@ -65,17 +71,17 @@ class Machine
     Player playa;
     Player playb;
     int rounds;
-    Moves finalmoveA, finalmoveB;
-
+    Moves finalmoveA, finalmoveB; 
+    String nameA, nameB;
     Machine(Player playera,Player playerb, int round){
        this.playa = playera;
        this.playb = playerb;
        this.rounds = round;
+        nameA = playa.getPlayer();
+        nameB = playb.getPlayer();
     }
     int coinA;
     int coinB;
-    String nameA = playa.getPlayer();
-    String nameB = playb.getPlayer();
      void calculateCoins(Moves moveA, Moves moveB){
      // String aopt = moveA;
      // String bopt = moveB;
@@ -101,7 +107,6 @@ class Machine
     playb.setScore(coinB);
     }
     void repeattimes(){
-        System.out.println("In repeat");
         for(int i=1; i<=rounds; i++)
         {
         System.out.println("Round " + i);
@@ -158,9 +163,11 @@ public class Gamerevised
     else if (nameB.equals("Human")){
     playerb = new Human();
     }
+    playera.player(nameA);
+    playerb.player(nameB);
     Machine mac = new Machine(playera, playerb, rounds);
-    playera.player(nameA, mac);
-    playerb.player(nameB, mac);
+    playera.getmachine(mac);
+    playerb.getmachine(mac);
     mac.repeattimes();
     System.out.println("Score of " + playera.getPlayer() + "(Player A) is: " + playera.getScore());
     System.out.println("Score of " + playerb.getPlayer() + "(Player B) is: " + playerb.getScore());
