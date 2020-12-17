@@ -13,8 +13,10 @@ abstract class Player
     Moves moveType = null;
     int score;
     Machine mac;
-    void getmachine(Machine mac){
+    Scanner scan;
+    void getobject(Machine mac, Scanner scan){
         this.mac = mac;
+        this.scan = scan;
     }
      void player(String name){
         this.name = name;
@@ -59,7 +61,6 @@ class Cooperate extends Player
 class Human extends Player
 {
     void setmoveType(){
-        Scanner scan = new Scanner(System.in);
         int move = scan.nextInt();
         this.moveType = Moves.values()[move];
     }
@@ -166,8 +167,8 @@ public class Gamerevised
     playera.player(nameA);
     playerb.player(nameB);
     Machine mac = new Machine(playera, playerb, rounds);
-    playera.getmachine(mac);
-    playerb.getmachine(mac);
+    playera.getobject(mac,in);
+    playerb.getobject(mac,in);
     mac.repeattimes();
     System.out.println("Score of " + playera.getPlayer() + "(Player A) is: " + playera.getScore());
     System.out.println("Score of " + playerb.getPlayer() + "(Player B) is: " + playerb.getScore());
