@@ -45,7 +45,6 @@ class Copycat extends Player
     if (oppmove == null)
     {
     this.moveType = Move.COOPERATE;
-
     }
     else
     {
@@ -144,23 +143,6 @@ class Cheat extends Player
   }
 }
 
-class Human extends Player
-{
-  Scanner scan;
-  Machine mac;
-    Human (Scanner in, Machine mac)
-  {
-    this.scan = in;
-    this.mac = mac;
-  }
-  Move getMoveType ()
-  {
-    mac.getNextMove ();
-    int move = scan.nextInt ();
-    return this.moveType = Move.values ()[move];
-  }
-}
-
 class Machine
 {
   Player playera;
@@ -197,88 +179,106 @@ class Machine
     playera.setScore (coinA);
     playerb.setScore (coinB);
   }
-  void play (Player playera, Player playerb, int round)
+  void play (Player playera, Player playerb)
   {
     this.playera = playera;
     this.playerb = playerb;
-    this.rounds = round;
-    for (i = 1; i <= rounds; i++)
+    for (i = 1; i <= 10; i++)
       {
-    System.out.println ("Round " + i);
-    System.out.println ("Input from " + playera.getPlayerName () + "(Player A) - 0(Cheat)/1(Cooperate)");
     finalmoveA = playera.getMoveType ();
-    System.out.println ("The move of " + playera.getPlayerName () + " is : " + finalmoveA.ordinal ());
-    System.out.println ("Input from " + playerb.getPlayerName () + "(Player B) - 0(Cheat)/1(Cooperate)");
     finalmoveB = playerb.getMoveType ();
-    System.out.println ("The move of " + playerb.getPlayerName () + " is : " + finalmoveB.ordinal ());
     calculateCoins (finalmoveA, finalmoveB);
       }
   }
   int playerFind = 1;
+  Move returnMove = null;
   Move getNextMove ()
   {
-    Move returnMove = null;
     if (playerFind % 2 == 1)
       {
-    returnMove = finalmoveB;
+    this.returnMove = finalmoveB;
     playerFind = playerFind + 1;
       }
     else if (playerFind % 2 == 0)
       {
-    returnMove = finalmoveA;
+    this.returnMove = finalmoveA;
     playerFind = playerFind + 1;
       }
-    return returnMove;
+    return this.returnMove;
+  }
+  void makingNull()
+  {
+    finalmoveA = null;
+    finalmoveB = null;
   }
 }
 
-public class Gamerevised
+public class Tournament
 {
-  public static Scanner in = new Scanner (System.in);
   public static Player playera = null;
   public static Player playerb = null;
   public static Machine mac = new Machine ();
-  public static int alternateEnter = 1;
+  public static int copycatScore, cooperateScore, grudgerScore, cheatScore, detectiveScore;
   static Player createPlayerObject (String type)
   {
     Player player = null;
-    String playerType = type.toLowerCase ();
-    switch (playerType)
+    switch (type)
       {
-      case "copycat":player = new Copycat (mac);
+      case "Copycat":player = new Copycat (mac);
       break;
-      case "cooperate":player = new Cooperate (mac);
+      case "Cooperate":player = new Cooperate (mac);
       break;
-      case "human":player = new Human (in, mac);
+      case "Grudger":player = new Grudger (mac);
       break;
-      case "grudger":player = new Grudger (mac);
+      case "Cheat":player = new Cheat (mac);
       break;
-      case "cheat":player = new Cheat (mac);
-      break;
-      case "detective":player = new Detective (mac);
+      case "Detective":player = new Detective (mac);
       break;
       }
     return player;
   }
+  static void finalScore(String type, int score)
+  {
+    switch (type)
+      {
+      case "Copycat":copycatScore = copycatScore + score;
+      break;
+      case "Cooperate":cooperateScore = cooperateScore + score;
+      break;
+      case "Grudger":grudgerScore = grudgerScore + score;
+      break;
+      case "Cheat":cheatScore = cheatScore + score;
+      break;
+      case "Detective":detectiveScore = detectiveScore + score;
+      break;
+      }
+  }
   public static void main (String[]args)
   {
-    System.out.println ("Let's begin the game.");
-    System.out.println ("Tell me the number of rounds you would like to play");
-    int rounds = in.nextInt ();
-    System.out.println("Choose playerA type - Copycat/Cooperate/Human/Cheat/Grudger/Detective");
-    String typeA = in.next ();
-    playera = createPlayerObject (typeA);
-    System.out.println("Choose playerB type - Copycat/Cooperate/Human/Cheat/Grudger/Detective");
-    String typeB = in.next ();
-    playerb = createPlayerObject (typeB);
-    System.out.println ("Tell the name of playerA");
-    String nameA = in.next ();
-    System.out.println ("Tell the name of playerB");
-    String nameB = in.next ();
-    playera.setPlayerName (nameA);
-    playerb.setPlayerName (nameB);
-    mac.play (playera, playerb, rounds);
-    System.out.println ("Score of " + playera.getPlayerName () + "(Player A) is: " + playera.getScore ());
-    System.out.println ("Score of " + playerb.getPlayerName () + "(Player B) is: " + playerb.getScore ());
+    int i, j;
+    String players[] = {"Copycat", "Cheat", "Cooperate", "Grudger", "Detective"};
+    for (i = 0; i < players.length - 1; i++)
+    {
+      for(j = i + 1; j<= players.length - 1; j++)
+      {
+      playera = createPlayerObject(players[i]);
+      playerb = createPlayerObject(players[j]);
+      playera.setPlayerName (players[i]);
+      playerb.setPlayerName (players[j]);
+      mac.play(playera, playerb);
+      String typeA = playera.getPlayerName();
+      String typeB = playerb.getPlayerName();
+      int scoreA = playera.getScore();
+      int scoreB = playerb.getScore();
+      finalScore(typeA, scoreA);
+      finalScore(typeB, scoreB);
+      mac.makingNull();
+    }
+    }
+    System.out.println("Final score of Copycat is : " + copycatScore);
+    System.out.println("Final score of Cheat is : " + cheatScore);
+    System.out.println("Final score of Cooperate is : " + cooperateScore);
+    System.out.println("Final score of Grudger is : " + grudgerScore);
+    System.out.println("Final score of Detective is : " + detectiveScore);
   }
 }
