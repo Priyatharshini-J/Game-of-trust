@@ -41,7 +41,8 @@ class Copycat extends Player
   }
   Move getMoveType ()
   {
-    Move oppmove = mac.getNextMove ();
+    Move oppmove = mac.getOppMove ();
+    mac.getMyMove();
     if (oppmove == null)
     {
     this.moveType = Move.COOPERATE;
@@ -50,6 +51,93 @@ class Copycat extends Player
     {
       this.moveType = oppmove;
     }
+    return this.moveType;
+  }
+}
+
+class Copykitten extends Player
+{
+  Machine mac;
+  int cheatcount = 0;
+    Copykitten (Machine mac)
+  {
+    this.mac = mac;
+  }
+  Move getMoveType ()
+  {
+    Move oppmove = mac.getOppMove ();
+    Move mymove = mac.getMyMove();
+    if(oppmove == Move.CHEAT)
+    {
+      cheatcount = cheatcount + 1;
+    }
+    else
+    {
+        cheatcount = 0;
+    } 
+    int i = mac.i;
+    if(cheatcount <= 2)
+    {
+      this.moveType = Move.COOPERATE;
+    }
+    else
+    {
+      this.moveType = oppmove;
+    }
+    return this.moveType;
+  }
+}
+
+class Simpleton extends Player
+{
+  Machine mac;
+  Simpleton(Machine mac)
+  {
+    this.mac = mac;
+  }
+  Move getMoveType ()
+  {
+    Move oppmove = mac.getOppMove ();
+    Move mymove = mac.getMyMove();
+    int i = mac.i;
+    if(i == 1)
+    {
+      this.moveType = Move.COOPERATE;
+    }
+    if(oppmove == Move.COOPERATE)
+    {
+      this.moveType = mymove;
+    }
+    else if(oppmove == Move.CHEAT)
+    {
+      int moveno = mymove.ordinal();
+      switch(moveno)
+      {
+        case 1 : this.moveType = Move.CHEAT;
+        break; 
+        case 0 : this.moveType = Move.COOPERATE;
+        break;
+      }
+    }
+      return this.moveType;
+  }
+}
+
+class Randomplay extends Player
+{
+  Machine mac;
+  int min = 0;
+  int max = 1;
+  Randomplay(Machine mac)
+  {
+    this.mac = mac;
+  }
+  Move getMoveType ()
+  {
+    mac.getOppMove();
+    mac.getMyMove();
+    int moveno =  (int)(Math.random()*(max-min+1)+min);
+    this.moveType = Move.values ()[moveno];
     return this.moveType;
   }
 }
@@ -64,7 +152,8 @@ class Grudger extends Player
   }
   Move getMoveType ()
   {
-    Move oppmove = mac.getNextMove ();
+    Move oppmove = mac.getOppMove ();
+    mac.getMyMove();
     int i = mac.i;
     if(i == 1)
     {
@@ -96,7 +185,8 @@ class Detective extends Player
 
   Move getMoveType ()
   {
-    Move oppmove = mac.getNextMove ();
+    Move oppmove = mac.getOppMove ();
+    mac.getMyMove();
     int i = mac.i;
     if (i <= 4)
     {
@@ -127,7 +217,8 @@ class Cooperate extends Player
   }
   Move getMoveType ()
   {
-    mac.getNextMove ();
+    mac.getOppMove ();
+    mac.getMyMove();
     return this.moveType = Move.COOPERATE;
   }
 }
@@ -142,7 +233,8 @@ class Cheat extends Player
   }
   Move getMoveType ()
   {
-    mac.getNextMove ();
+    mac.getOppMove ();
+    mac.getMyMove();
     return this.moveType = Move.CHEAT;
   }
 }
@@ -158,7 +250,8 @@ class Human extends Player
   }
   Move getMoveType ()
   {
-    mac.getNextMove ();
+    mac.getOppMove ();
+    mac.getMyMove();
     System.out.println("Enter your move - 0(Cheat) / 1(Cooperate)");
     int move = scan.nextInt ();
     return this.moveType = Move.values ()[move];
@@ -178,8 +271,6 @@ class Machine
   {
     int scoreA = playera.getScore ();
     int scoreB = playerb.getScore ();
-    // System.out.println(playera + " : " + scoreA);
-    // System.out.println(playerb + " : " + scoreB);
     if (moveA == Move.CHEAT && moveB == Move.CHEAT)
       {
     this.coinA = scoreA;
@@ -217,7 +308,7 @@ class Machine
   }
   int playerFind = 1;
   Move returnMove = null;
-  Move getNextMove ()
+  Move getOppMove ()
   {
     if (playerFind % 2 == 1)
       {
@@ -231,6 +322,21 @@ class Machine
       }
     return this.returnMove;
   }
+  Move getMyMove ()
+  {
+    if (playerFind % 2 == 1)
+      {
+    this.returnMove = finalmoveA;
+    playerFind = playerFind + 1;
+      }
+    else if (playerFind % 2 == 0)
+      {
+    this.returnMove = finalmoveB;
+    playerFind = playerFind + 1;
+      }
+    return this.returnMove;
+  }
+
   void makingNull()
   {
     finalmoveA = null;
@@ -273,6 +379,9 @@ class Tournamentmain
     Player grudger = new Grudger (mac);
     Player detective = new Detective (mac);
     Player human = new Human(scan,mac);
+    Player copykitten = new Copykitten (mac);
+    Player simpleton = new Simpleton (mac);
+    Player randomplay = new Randomplay (mac);
     ArrayList<Player> players = new ArrayList<Player>();
     players.add(cooperate);
     players.add(grudger);
@@ -280,6 +389,9 @@ class Tournamentmain
     players.add(cheat);
     players.add(detective);
     players.add(human);
+    players.add(copykitten);
+    players.add(simpleton);
+    players.add(randomplay);
     Tournamentmain tournamentmain = new Tournamentmain();
     tournamentmain.playTournament(players,10,mac);
   }
