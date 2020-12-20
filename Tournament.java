@@ -306,33 +306,35 @@ class Machine
     calculateCoins (finalmoveA, finalmoveB);
       }
   }
-  int playerFind = 1;
+  int opplayer = 1;
+  int myplayer = 1;
   Move returnMove = null;
-  Move getOppMove ()
+  Move getOppPreviousMove ()
   {
-    if (playerFind % 2 == 1)
+    if (opplayer % 2 == 1)
       {
     this.returnMove = finalmoveB;
-    playerFind = playerFind + 1;
+    opplayer = opplayer + 1;
       }
-    else if (playerFind % 2 == 0)
+    else if (opplayer % 2 == 0)
       {
     this.returnMove = finalmoveA;
-    playerFind = playerFind + 1;
+    opplayer = opplayer + 1;
       }
     return this.returnMove;
   }
-  Move getMyMove ()
+
+  Move getMyPreviousMove ()
   {
-    if (playerFind % 2 == 1)
+    if (myplayer % 2 == 1)
       {
     this.returnMove = finalmoveA;
-    playerFind = playerFind + 1;
+    myplayer = myplayer + 1;
       }
-    else if (playerFind % 2 == 0)
+    else if (myplayer % 2 == 0)
       {
     this.returnMove = finalmoveB;
-    playerFind = playerFind + 1;
+    myplayer = myplayer + 1;
       }
     return this.returnMove;
   }
@@ -368,7 +370,6 @@ class Tournamentmain
 
  public class Tournament
  { 
-
   public static void main (String[] args)
   {
     Scanner scan = new Scanner(System.in);
